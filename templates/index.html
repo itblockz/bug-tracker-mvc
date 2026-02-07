@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Bug List</title>
+</head>
+
+<body>
+    <h1>รายการบั๊ก</h1>
+
+    {% if session.user_id %}
+    <p>สวัสดี, {{ session.user_name }} ({{ session.user_role }}) | <a href="/logout">ออกจากระบบ</a></p>
+    {% else %}
+    <p><a href="/login">เข้าสู่ระบบ</a></p>
+    {% endif %}
+
+    <!-- ปุ่มเรียงลำดับ -->
+    <p>
+        เรียงตาม:
+        <a href="?sort=severity" {% if sort_by=='severity' %}style="font-weight:bold" {% endif %}>ความรุนแรง</a> |
+        <a href="?sort=reports" {% if sort_by=='reports' %}style="font-weight:bold" {% endif %}>จำนวนรายงาน</a>
+    </p>
+
+    <p><a href="/summary">📊 หน้าสรุปผล</a></p>
+
+    <table border="1">
+        <tr>
+            <th>รหัส</th>
+            <th>หัวข้อ</th>
+            <th>แหล่งที่มา</th>
+            <th>วันที่</th>
+            <th>ความรุนแรง</th>
+            <th>สถานะ</th>
+            <th>จำนวนรายงาน</th>
+        </tr>
+        {% for bug, report_count in bugs %}
+        <tr>
+            <td>{{ bug.id }}</td>
+            <td><a href="/bug/{{ bug.id }}">{{ bug.title }}</a></td>
+            <td>{{ bug.source }}</td>
+            <td>{{ bug.created_date.strftime('%Y-%m-%d') }}</td>
+            <td>{{ bug.severity_score }}</td>
+            <td>{{ bug.status }}</td>
+            <td>{{ report_count }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>สรุปผล</title>
+</head>
+
+<body>
+    <h1>หน้าสรุปผล</h1>
+    <p><a href="/">← กลับหน้าหลัก</a></p>
+
+    <!-- บั๊กสถานะ critical -->
+    <h2>🔥 บั๊กสถานะ Critical ({{ critical_bugs|length }})</h2>
+    {% if critical_bugs %}
+    <table border="1">
+        <tr>
+            <th>รหัส</th>
+            <th>หัวข้อ</th>
+            <th>แหล่งที่มา</th>
+            <th>จำนวนรายงาน</th>
+        </tr>
+        {% for b in critical_bugs %}
+        <tr>
+            <td>{{ b.id }}</td>
+            <td><a href="/bug/{{ b.id }}">{{ b.title }}</a></td>
+            <td>{{ b.source }}</td>
+            <td>{{ b.bug_reports|length }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>ไม่มีบั๊กสถานะ critical</p>
+    {% endif %}
+
+    <hr>
+
+    <!-- บั๊กที่ถูกยืนยัน -->
+    <h2>✅ บั๊กที่ถูกตรวจสอบแล้ว ({{ verified_bugs|length }})</h2>
+    {% if verified_bugs %}
+    <table border="1">
+        <tr>
+            <th>รหัส</th>
+            <th>หัวข้อ</th>
+            <th>ผลการตรวจสอบ</th>
+        </tr>
+        {% for b in verified_bugs %}
+        <tr>
+            <td>{{ b.id }}</td>
+            <td><a href="/bug/{{ b.id }}">{{ b.title }}</a></td>
+            <td>
+                {% if b.verification_result == 'fixed' %}
+                ✅ Fixed (แก้ไขแล้ว)
+                {% else %}
+                ❌ Won't Fix (ไม่แก้ไข)
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>ยังไม่มีบั๊กที่ถูกตรวจสอบ</p>
+    {% endif %}
+</body>
+
+</html>

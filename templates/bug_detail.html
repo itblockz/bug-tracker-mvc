@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{ bug.title }}</title>
+</head>
+
+<body>
+    <h1>{{ bug.title }}</h1>
+    <p><a href="/">← กลับหน้าหลัก</a></p>
+
+    <!-- รายละเอียดบั๊ก -->
+    <table border="1">
+        <tr>
+            <th>รหัส</th>
+            <td>{{ bug.id }}</td>
+        </tr>
+        <tr>
+            <th>แหล่งที่มา</th>
+            <td>{{ bug.source }}</td>
+        </tr>
+        <tr>
+            <th>วันที่สร้าง</th>
+            <td>{{ bug.created_date.strftime('%Y-%m-%d') }}</td>
+        </tr>
+        <tr>
+            <th>ความรุนแรง</th>
+            <td>{{ bug.severity_score }}</td>
+        </tr>
+        <tr>
+            <th>สถานะ</th>
+            <td>{{ bug.status }}</td>
+        </tr>
+    </table>
+
+    <hr>
+
+    <!-- ส่วนรายงานบั๊ก (สำหรับ user ที่ login และไม่ใช่ developer) -->
+    {% if session.user_id and session.user_role != 'developer' %}
+    {% if bug.verified %}
+    <p>🔒 บั๊กนี้ถูกตรวจสอบแล้ว ไม่สามารถรายงานเพิ่มได้</p>
+    {% elif already_reported %}
+    <p>✅ คุณรายงานบั๊กนี้แล้ว</p>
+    {% else %}
+    <h2>รายงานบั๊กนี้</h2>
+    <form method="POST" action="/bug/{{ bug.id }}/report">
+        <label>ประเภทรายงาน:</label>
+        <select name="report_type" required>
+            <option value="UI Bug">UI Bug</option>
+            <option value="Logic Bug">Logic Bug</option>
+            <option value="Performance Bug">Performance Bug</option>
+        </select>
+        <button type="submit">รายงาน</button>
+    </form>
+    {% endif %}
+    {% elif not session.user_id %}
+    <p><a href="/login">เข้าสู่ระบบ</a> เพื่อรายงานบั๊ก</p>
+    {% endif %}
+
+    <hr>
+
+    <!-- ส่วนตรวจสอบ (สำหรับ developer เท่านั้น) -->
+    {% if session.user_role == 'developer' %}
+    {% if bug.verified %}
+    <h2>✅ ผลการตรวจสอบ</h2>
+    <p>บั๊กนี้: <strong>{{ bug.verification_result }}</strong></p>
+    {% else %}
+    <h2>ตรวจสอบบั๊ก</h2>
+    <form method="POST" action="/bug/{{ bug.id }}/verify">
+        <label>ผลการตรวจสอบ:</label>
+        <select name="verification_result" required>
+            <option value="fixed">Fixed (แก้ไขแล้ว)</option>
+            <option value="won't fix">Won't Fix (ไม่แก้ไข)</option>
+        </select>
+        <button type="submit">บันทึกการตรวจสอบ</button>
+    </form>
+    {% endif %}
+    {% endif %}
+
+    <hr>
+
+    <!-- แสดงรายงานทั้งหมด -->
+    <h2>รายงานที่ได้รับ ({{ reports|length }})</h2>
+    {% if reports %}
+    <table border="1">
+        <tr>
+            <th>ผู้รายงาน</th>
+            <th>ประเภท</th>
+            <th>วันที่</th>
+        </tr>
+        {% for r in reports %}
+        <tr>
+            <td>{{ r.user.name }}</td>
+            <td>{{ r.report_type }}</td>
+            <td>{{ r.report_date.strftime('%Y-%m-%d %H:%M') }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>ยังไม่มีรายงาน</p>
+    {% endif %}
+</body>
+
+</html>

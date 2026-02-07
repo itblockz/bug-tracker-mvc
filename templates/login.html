@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+    <h1>เข้าสู่ระบบ</h1>
+    
+    {% if error %}
+    <p style="color: red;">{{ error }}</p>
+    {% endif %}
+    
+    <form method="POST">
+        <label>รหัสผู้ใช้ (ID):</label><br>
+        <input type="number" name="user_id" required><br><br>
+        <button type="submit">เข้าสู่ระบบ</button>
+    </form>
+</body>
+</html>
